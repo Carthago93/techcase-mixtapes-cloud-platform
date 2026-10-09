@@ -1,64 +1,52 @@
 # Architecture
 ## Objective
 
-The objective is to make Mixtapes audio delivery globally scalable, secure and cost-efficient without requiring the existing PHP application to proxy audio traffic.
+Modernize Mixtapes to support international growth while maintaining secure audio delivery, scalable application workloads and manageable operating costs.
 
-**High-level design**
+## Architecture Layers
+**1. Application layer**
 
-                    Global users
-                         |
-                         v
-                  Mixtapes frontend
-                         |
-                         v
-                  PHP REST API
-                         |
-              Authentication and
-                 authorization
-                         |
-                  Signed URL
-                         |
-                         v
-                    CloudFront
-                         |
-                    Private S3
-                    audio origin
-                    
-The PHP API authorizes access to individual tracks. Once authorization succeeds, the client receives a short-lived signed CloudFront URL.
+The PHP REST API runs as a containerized application on Amazon EKS.
 
-Audio is delivered directly through CloudFront rather than through the PHP application.
+Kubernetes Deployments manage application replicas, while Services provide stable internal connectivity. An application entry point, such as an AWS Application Load Balancer managed through an appropriate ingress integration, exposes the API over HTTPS.
 
-## Storage model
+**2. Audio delivery layer**
 
-Each track has a unique identifier and separate objects for its master recording and distribution formats.
+Audio files are stored in a private S3 bucket and distributed through CloudFront.
 
-**Example:**
+The API authorizes playback and provides a short-lived signed URL. The client retrieves the audio directly from CloudFront rather than streaming it through the PHP application.
 
-music/
-  track-123/
-    master.flac
-    stream.mp3
-    stream.aac
+**3. Infrastructure layer**
 
-Production implementations should use versioned or immutable object keys when audio content changes.
+Terraform provisions the AWS infrastructure, including the networking foundation, EKS cluster, node capacity, S3 storage and CloudFront distribution.
 
-## Request flow
+Kubernetes manifests manage application workloads separately from the underlying cloud infrastructure.
+
+## Request Flow
 A user requests playback through the Mixtapes application.
 The API authenticates the user and checks track-level permissions.
-The API issues a short-lived signed URL.
-The client requests the audio from CloudFront.
+The API issues a signed CloudFront URL.
+The client requests the audio through CloudFront.
 CloudFront validates the signature and serves a cached object or retrieves it from S3.
-Monitoring captures delivery performance, errors and traffic.
+Monitoring captures relevant application and delivery metrics.
 
-## Scalability
-CloudFront scales the delivery layer independently of the PHP application. S3 provides object storage without the need to manage storage servers.
+## Scaling Strategy
 
-Application workloads can be containerized and scaled separately when required.
+Application scaling and audio delivery scaling are independent.
 
-## Availability and resilience
-The initial design reduces dependence on a single application server for audio delivery.
+Kubernetes replica scaling adjusts the number of application Pods.
+Node autoscaling adjusts available worker capacity.
+S3 provides managed object storage.
+CloudFront distributes cached audio to users across geographic regions.
 
-Further production work should define recovery objectives, backup and retention policies, infrastructure deployment procedures, and acceptable downtime.
+Audio transcoding should run as a separate worker workload rather than blocking API requests.
+
+## Availability and Recovery
+
+A production deployment should distribute worker capacity across multiple Availability Zones and define suitable Pod placement, disruption budgets and health checks.
+
+Recovery objectives, backup policies, cluster upgrade procedures and regional disaster recovery require additional design and testing.
 
 ## Scope
-This implementation covers the audio storage and delivery infrastructure. User dashboards, application authorization, audio transcoding and the complete backend are documented as integration points rather than claimed as implemented features.
+
+The repository focuses on infrastructure and deployment design. Any component not implemented and validated should be described as proposed rather than operational.
