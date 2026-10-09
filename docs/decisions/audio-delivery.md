@@ -19,8 +19,8 @@ CloudFront caching reduces repeated origin requests and allows audio delivery to
 S3 avoids the need to operate storage servers or mount audio libraries into application containers.
 
 ## Alternatives Considered
-Streaming audio through PHP application Pods.
-Serving audio from public S3 objects.
+Streaming audio through PHP application Pods;
+Serving audio from public S3 objects;
 Operating regional audio servers.
 
 ## Consequences
