@@ -1,56 +1,63 @@
 # Cost Analysis
-## Main cost drivers
+## Main Cost Drivers
 
-**The primary cost drivers are:**
+**The main cost categories are:**
 
-S3 storage volume.
-CloudFront data transfer to users.
-CDN and storage requests.
-Audio transcoding and processing.
-Logging, monitoring and retained versions.
-Supporting application and database infrastructure.
-Storage estimate
+Amazon EKS cluster management.
+EC2 worker nodes and associated storage.
+Load balancers and networking.
+NAT Gateway processing and data transfer, where applicable.
+S3 storage and requests.
+CloudFront data transfer and requests.
+Logging, monitoring and retention.
+Audio transcoding and background processing.
+Storage Estimate
 
-**An average track consists of:**
+**The average estimated file sizes are:**
 
 FLAC master: 6 MB.
-MP3 version: 3 MB.
-AAC version: 3 MB.
+MP3 distribution file: 3 MB.
+AAC distribution file: 3 MB.
 
-The estimated total is 12 MB per track, excluding metadata, versions and overhead.
+This results in approximately 12 MB per track, excluding metadata, additional versions and storage overhead.
 
-For 100,000 tracks:
+**For 100,000 tracks:**
 
-100,000 × 12 MB = approximately 1.2 TB of stored audio.
+100,000 × 12 MB = approximately 1.2 TB of audio.
 
-## Delivery estimate
+## Delivery Estimate
 
-If 100,000 tracks are each downloaded in full 100 times at an average distribution-file size of 3 MB, the resulting audio delivery volume is approximately 30 TB.
+If 100,000 tracks are each downloaded in full 100 times at an average delivery-file size of 3 MB, the resulting delivery volume is approximately 30 TB.
 
-This is an illustrative scenario rather than a forecast. Actual delivery volume depends on playback duration, format, user behavior and caching.
+This is an illustrative scenario rather than a forecast. Real usage depends on playback duration, audio format, caching and user behavior.
 
-## Cost optimization
-Use CloudFront to reduce repeated origin requests.
-Monitor cache-hit ratio and origin traffic.
-Evaluate CloudFront price classes against target markets.
-Review S3 lifecycle transitions against actual access patterns.
+## EKS Cost Considerations
+
+EKS introduces a recurring cluster-management cost in addition to worker-node and networking costs.
+
+Worker nodes should be sized against actual workload requirements. Autoscaling can reduce unused capacity, but a minimum number of nodes is still needed for availability and scheduling.
+
+Development environments can use smaller capacity and scheduled shutdowns where appropriate. Production should not sacrifice availability simply to minimize compute costs.
+
+## Cost Optimization
+Keep audio delivery outside the Kubernetes cluster.
+Monitor CloudFront cache-hit ratio and origin requests.
+Right-size EC2 worker nodes.
+Evaluate Cluster Autoscaler or Karpenter for node provisioning.
+Scale application replicas using workload metrics.
+Control log retention and monitoring volume.
+Review NAT Gateway costs and alternative network designs.
 Configure AWS Budgets and cost alerts.
-Monitor unexpected traffic spikes and automated downloads.
-Evaluate transcoding costs separately from delivery costs.
+Compare EKS costs with alternative managed container services.
+Evaluation Criteria
 
-## Important limitations
+**The EKS decision should be reviewed against:**
 
-CloudFront caching does not eliminate data-transfer costs. Regional pricing, request volume and the geographic distribution of users affect expenditure.
-
-S3 Intelligent-Tiering can reduce storage costs for suitable access patterns, but monitoring charges and minimum storage-duration rules must be considered.
-
-Before production deployment, validate estimates against current AWS pricing and realistic traffic measurements.
-
-## KPIs
-Monthly audio delivery cost.
-Cost per 1,000 full-track plays.
+Monthly infrastructure cost.
+Cost per 1,000 successful playback sessions.
+Worker-node utilization.
+Application latency and error rate.
 CloudFront cache-hit ratio.
-S3 origin requests and data transfer.
-Average time to first audio byte.
-Storage cost per active track.
-Cost per successfully transcoded track.
+Operational effort required to maintain the platform.
+
+Actual pricing should be calculated using current AWS pricing and realistic workload assumptions before production deployment.
