@@ -64,6 +64,8 @@ This separation allows the application layer and audio delivery layer to scale i
 
 **Repository Structure:**
 
+The repository is organized into reusable Terraform modules, environment-specific configurations and supporting documentation.
+
 mixtapes-cloud-platform/
 ├── README.md
 ├── docs/
@@ -71,6 +73,9 @@ mixtapes-cloud-platform/
 │   ├── security.md
 │   ├── cost-analysis.md
 │   └── decisions/
+│       ├── 001-cloud-provider.md
+│       ├── 002-audio-delivery.md
+│       └── 003-container-platform.md
 ├── terraform/
 │   ├── modules/
 │   │   ├── audio-storage/
