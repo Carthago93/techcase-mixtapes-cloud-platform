@@ -1,30 +1,44 @@
 # Container Platform Selection
-Status: Proposed
-Decision: Prefer ECS Fargate for the initial application container platform
+Status: Accepted for the proposed portfolio architecture
+Decision: Amazon EKS with Kubernetes
 
 ## Context
 
-The existing PHP REST API may need to scale independently of audio delivery.
+Mixtapes needs a scalable application platform that supports containerized workloads, automated deployments and independent scaling of API and background-processing services.
 
-The team has three people responsible for platform maintenance and limited cloud experience.
+The operations team is small, so the platform must balance Kubernetes capabilities with operational complexity and cost.
 
 ## Decision
 
-Prefer Amazon ECS with Fargate for the initial containerized application platform.
+Use Amazon EKS as the managed Kubernetes control plane, with EC2 worker nodes for application workloads.
+
+Use Kubernetes Deployments and Services for the PHP REST API. Evaluate Horizontal Pod Autoscaler and a node autoscaling solution for workload scaling.
+
+Audio files remain in S3 and are delivered through CloudFront rather than through the Kubernetes application Pods.
 
 ## Rationale
 
-Fargate removes the need to manage worker nodes and a Kubernetes control plane. It allows the team to focus on the application, security and deployment process.
+EKS provides a managed Kubernetes control plane while retaining Kubernetes APIs and ecosystem compatibility.
 
-## Alternatives considered
-Amazon EKS with Kubernetes.
-EC2 instances with self-managed containers.
-Serverless functions for selected event-driven tasks.
+This approach demonstrates container orchestration, workload scheduling, deployment configuration and autoscaling.
+
+It also provides flexibility for future services, including asynchronous audio transcoding and background processing.
+
+## Alternatives Considered
+Amazon ECS with Fargate for lower infrastructure-management overhead.
+Self-managed Kubernetes on EC2.
+Serverless functions for selected event-driven workloads.
+
+## Trade-offs
+
+EKS requires additional operational expertise and introduces costs for cluster management, worker nodes, networking, monitoring and upgrades.
+
+The team must manage Kubernetes RBAC, node capacity, workload resources, cluster add-ons and application deployment practices.
 
 ## Consequences
 
-ECS Fargate may reduce operational overhead but provides a different ecosystem and portability model from Kubernetes.
+The project prioritizes Kubernetes flexibility and demonstrates EKS architecture, while acknowledging that a simpler container platform could be more cost-effective for a small application.
 
-EKS should be reconsidered if the organization adopts Kubernetes as a standard or needs its scheduling, ecosystem and platform capabilities.
+The decision should be revisited using actual cost, performance and operational measurements.
 
-This decision does not imply that the application platform has already been implemented or deployed.
+This decision documents the intended architecture. It does not imply that an EKS cluster has already been deployed.
