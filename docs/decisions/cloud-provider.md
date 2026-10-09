@@ -1,28 +1,32 @@
 # Cloud Provider Selection
-Status: Accepted for the portfolio design
-Decision: AWS
+Status: Accepted
+Decision: Amazon Web Services (AWS)
 
 ## Context
 
-Mixtapes needs globally distributed audio delivery, durable object storage, access controls and infrastructure that can be managed by a small IT team.
+Mixtapes requires global audio delivery, durable object storage, secure application hosting and infrastructure that can scale internationally.
 
 ## Decision
 
-Use Amazon S3 for audio object storage and Amazon CloudFront for content delivery.
+Use AWS as the cloud platform.
+
+Amazon S3 provides audio storage, CloudFront provides content delivery and Amazon EKS provides the container orchestration platform.
 
 Terraform manages the infrastructure configuration.
 
 ## Rationale
 
-S3 and CloudFront integrate directly and support a private-origin architecture. The services reduce the need to operate storage servers and regional delivery infrastructure.
+AWS offers integrated services for object storage, global delivery, identity management, networking and Kubernetes.
 
-## Alternatives considered
-Azure Blob Storage with Azure Front Door or Azure CDN.
-Google Cloud Storage with Cloud CDN.
-Self-managed storage servers and a separately operated CDN.
+This allows the platform to separate application execution from audio distribution.
+
+## Alternatives Considered
+Microsoft Azure.
+Google Cloud Platform.
+Traditional hosting with a separately managed CDN.
 
 ## Consequences
 
-The design benefits from managed services and AWS integration but creates dependency on AWS services and pricing.
+The design benefits from managed AWS services but creates dependency on AWS pricing, service availability and platform-specific integrations.
 
-The decision should be revisited if organizational standards, contractual requirements or cost measurements favor another platform.
+The choice should be reviewed if organizational requirements or measured cost comparisons favor another platform.
