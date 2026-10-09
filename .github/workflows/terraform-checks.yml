@@ -1,30 +1,36 @@
 name: Terraform Checks
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
-
-permissions:
-  contents: read
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-checks.yml'
+  pull_request:
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-checks.yml'
 
 jobs:
-  validate:
+  terraform:
+    name: Terraform Validate
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: terraform/modules/eks
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Format
-        run: terraform fmt -check -recursive terraform/
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
 
-      - name: Validate dev configuration
-        working-directory: terraform/environments/dev
-        run: |
-          terraform init -backend=false
-          terraform validate
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
